@@ -79,7 +79,7 @@ public:
      	// Stuff to output the number of cells in the crypt to a dat file.
         /** Results file cell velocities. */
         out_stream p_cell_number_file;
-        OutputFileHandler output_file_handler("PottsCrypt/Sweeps/", false);
+        OutputFileHandler output_file_handler("PottsCryptSweeps/", false);
         p_cell_number_file = output_file_handler.OpenOutputFile("cellnumbers.dat");
 
      	double number_of_cells_in_middle = 0.0;
