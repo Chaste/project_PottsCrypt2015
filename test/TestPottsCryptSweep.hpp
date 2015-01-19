@@ -72,8 +72,8 @@ public:
 
      	//double num_sweeps[12] = {1, 2, 3, 5, 10, 20, 30, 50, 100, 200, 300, 500};
      	//unsigned max_num_sweeps_index = 10;
-     	double num_sweeps[6] = {1, 3, 10, 30, 100, 300};
-     	unsigned max_num_sweeps_index = 6;
+     	double dt[6] = {1, 1.0/3.0, 1.0/10.0, 1.0/30.0, 1.0/100.0, 1.0/300.0};
+     	unsigned max_dt_index = 6;
 
 
      	// Stuff to output the number of cells in the crypt to a dat file.
@@ -91,9 +91,9 @@ public:
 			std::cout << "\n Temp " << temp[temp_index] << ", " << std::flush;
 
 			// Loop over Num Sweeps
-			for (unsigned num_sweeps_index=0;  num_sweeps_index < max_num_sweeps_index; num_sweeps_index++)
+			for (unsigned dt_index=0;  dt_index < max_dt_index; dt_index++)
 			{
-				std::cout << "\n\tNum Sweeps " << num_sweeps[num_sweeps_index] << "... " << std::flush;
+				std::cout << "\n\tDt " << dt[dt_index] << "... " << std::flush;
 
 			    for(unsigned index=start_sim; index < start_sim + num_sims; index++)
 				{
@@ -126,7 +126,7 @@ public:
 
 					// Create cell population
 					PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
-					cell_population.SetNumSweepsPerTimestep(num_sweeps[num_sweeps_index]);
+					cell_population.SetNumSweepsPerTimestep(1);
 					cell_population.SetTemperature(temp[temp_index]);
 
 			        cell_population.AddCellPopulationCountWriter<CellProliferativeTypesCountWriter>();
@@ -142,13 +142,13 @@ public:
 
 					// Set up cell-based simulation
 					OnLatticeSimulation<2> simulator(cell_population);
-					simulator.SetDt(1.0);
-					simulator.SetSamplingTimestepMultiple(100);
+					simulator.SetDt(dt[dt_index]);
+					simulator.SetSamplingTimestepMultiple((unsigned)(100.0/dt[dt_index]));
 					simulator.SetOutputCellVelocities(true);
 
 					//Create output directory
 					std::stringstream out;
-					out << "/Temp_"<< temp[temp_index] << "/NumSweeps_" << num_sweeps[num_sweeps_index] << "/RunIndex_" << index;
+					out << "/Temp_"<< temp[temp_index] << "/Dt_" << dt[dt_index] << "/RunIndex_" << index;
 					std::string output_directory = "Potts/CylindricalCrypt/Sweeps/" +  out.str();
 					simulator.SetOutputDirectory(output_directory);
 
@@ -184,7 +184,7 @@ public:
 			    number_of_cells_in_middle  /= (double) num_sims;
 			    number_of_cells_at_end  /= (double) num_sims;
 
-				*p_cell_number_file << temp[temp_index] << "\t" << num_sweeps[num_sweeps_index] << "\t" << number_of_cells_in_middle << "\t" << number_of_cells_at_end << "\n";
+				*p_cell_number_file << temp[temp_index] << "\t" << dt[dt_index] << "\t" << number_of_cells_in_middle << "\t" << number_of_cells_at_end << "\n";
 
 				number_of_cells_in_middle = 0.0;
 			    number_of_cells_at_end = 0.0;
