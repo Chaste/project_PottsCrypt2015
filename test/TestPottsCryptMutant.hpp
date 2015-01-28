@@ -2,18 +2,18 @@
 #define TESTPOTTSCRYPTMUTANT_HPP_
 
 #include <cxxtest/TestSuite.h>
-#include "../../../PottsCrypt2015/src/MutantBaseTrackerModifier.hpp"
-#include "../src/CellSurfaceAreasWriter.hpp"
 
 // Must be included before other cell_based headers
 #include "CellBasedSimulationArchiver.hpp"
 
+
+#include "MutantBaseTrackerModifier.hpp"
 #include "TransitCellProliferativeType.hpp"
 #include "HoneycombMeshGenerator.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
 #include "WntConcentration.hpp"
-#include "SimpleWntCellCycleModel.hpp"
+#include "FixedSimpleWntCellCycleModel.hpp"
 #include "FixedDurationGenerationBasedCellCycleModel.hpp"
 #include "StochasticDurationGenerationBasedCellCycleModel.hpp"
 #include "WildTypeCellMutationState.hpp"
@@ -32,7 +32,6 @@
 #include "CellProliferativeTypesWriter.hpp"
 #include "CellMutationStatesWriter.hpp"
 #include "CellIdWriter.hpp"
-#include "CellSurfaceAreasWriter.hpp"
 #include "CellVolumesWriter.hpp"
 
 
@@ -127,16 +126,16 @@ public:
 
                     // Create cells
                     std::vector<CellPtr> cells;
-                    CellsGenerator<SimpleWntCellCycleModel, 2> cells_generator;
+                    CellsGenerator<FixedSimpleWntCellCycleModel, 2> cells_generator;
                     cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
 
                     // Alter cells properties
                     for (unsigned i=0; i<cells.size(); i++)
                     {
                     	// So N(16,1) as in Phil trans paper
-                        dynamic_cast<SimpleWntCellCycleModel*>(cells[i]->GetCellCycleModel())->SetTransitCellG1Duration(6);
-                        dynamic_cast<SimpleWntCellCycleModel*>(cells[i]->GetCellCycleModel())->SetWntTransitThreshold(2.0/3.0);
-                        dynamic_cast<SimpleWntCellCycleModel*>(cells[i]->GetCellCycleModel())->SetWntLabelledThreshold(0.0); // As labelling mutant cells
+                        dynamic_cast<FixedSimpleWntCellCycleModel*>(cells[i]->GetCellCycleModel())->SetTransitCellG1Duration(6);
+                        dynamic_cast<FixedSimpleWntCellCycleModel*>(cells[i]->GetCellCycleModel())->SetWntTransitThreshold(2.0/3.0);
+                        dynamic_cast<FixedSimpleWntCellCycleModel*>(cells[i]->GetCellCycleModel())->SetWntLabelledThreshold(0.0); // As labelling mutant cells
                     }
 
                     boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<ApcTwoHitCellMutationState>());
@@ -151,7 +150,6 @@ public:
 			        cell_population.AddCellWriter<CellProliferativeTypesWriter>();
 			        cell_population.AddCellWriter<CellMutationStatesWriter>();
 			        cell_population.AddCellWriter<CellVolumesWriter>();
-			        cell_population.AddCellWriter<CellSurfaceAreasWriter>();
 					cell_population.AddCellWriter<CellIdWriter>();
 
                     // Create an instance of a Wnt concentration
