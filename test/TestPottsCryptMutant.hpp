@@ -3,6 +3,7 @@
 
 #include <cxxtest/TestSuite.h>
 #include "../../../PottsCrypt2015/src/MutantBaseTrackerModifier.hpp"
+#include "../src/CellSurfaceAreasWriter.hpp"
 
 // Must be included before other cell_based headers
 #include "CellBasedSimulationArchiver.hpp"
@@ -27,10 +28,13 @@
 #include "OffLatticeSimulation.hpp"
 
 #include "CellProliferativeTypesCountWriter.hpp"
+#include "CellMutationStatesCountWriter.hpp"
 #include "CellProliferativeTypesWriter.hpp"
 #include "CellMutationStatesWriter.hpp"
-#include "CellVolumesWriter.hpp"
 #include "CellIdWriter.hpp"
+#include "CellSurfaceAreasWriter.hpp"
+#include "CellVolumesWriter.hpp"
+
 
 #include "Warnings.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
@@ -62,7 +66,7 @@ public:
 
     void TestMultipleMutantPottsCrypts() throw (Exception)
     {
-
+//
 //        TS_ASSERT(CommandLineArguments::Instance()->OptionExists("-run_index"));
 //        unsigned start_index = CommandLineArguments::Instance()->GetUnsignedCorrespondingToOption("-run_index");
 //
@@ -84,13 +88,15 @@ public:
 
         double blob_radius = 10.0;
 
-        unsigned num_blob_heights = 4;
-        //double blob_heights[1] = {20.0};
-        double blob_heights[4] = {20.0, 40.0, 60.0, 80.0};
+        unsigned num_blob_heights = 1;
+        double blob_heights[2] = {20.0,60.0};
+        //double blob_heights[4] = {20.0, 40.0, 60.0, 80.0};
 
-        unsigned num_drag_ratios = 5;
-        double drag_ratios[5] = {1.0, 5.0, 10.0, 15.0, 20.0};
+        unsigned num_drag_ratios = 1;
+        //double drag_ratios[1] = {20.0};
+        //double drag_ratios[5] = {1.0, 5.0, 10.0, 15.0, 20.0};
         //double drag_ratios[20] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0};
+        double drag_ratios[20] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0, 19.0, 20.0};
 
 //        unsigned start_sim = 0;
 //        unsigned num_sims = 100;
@@ -127,6 +133,7 @@ public:
                     // Alter cells properties
                     for (unsigned i=0; i<cells.size(); i++)
                     {
+                    	// So N(16,1) as in Phil trans paper
                         dynamic_cast<SimpleWntCellCycleModel*>(cells[i]->GetCellCycleModel())->SetTransitCellG1Duration(6);
                         dynamic_cast<SimpleWntCellCycleModel*>(cells[i]->GetCellCycleModel())->SetWntTransitThreshold(2.0/3.0);
                         dynamic_cast<SimpleWntCellCycleModel*>(cells[i]->GetCellCycleModel())->SetWntLabelledThreshold(0.0); // As labelling mutant cells
@@ -137,12 +144,14 @@ public:
 
                     // Create cell population
                     PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
-                    cell_population.SetNumSweepsPerTimestep(10);
+                    cell_population.SetNumSweepsPerTimestep(1);
 
 			        cell_population.AddCellPopulationCountWriter<CellProliferativeTypesCountWriter>();
+			        cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
 			        cell_population.AddCellWriter<CellProliferativeTypesWriter>();
 			        cell_population.AddCellWriter<CellMutationStatesWriter>();
 			        cell_population.AddCellWriter<CellVolumesWriter>();
+			        cell_population.AddCellWriter<CellSurfaceAreasWriter>();
 					cell_population.AddCellWriter<CellIdWriter>();
 
                     // Create an instance of a Wnt concentration
@@ -152,6 +161,7 @@ public:
 
                     // Set up cell-based simulation
                     OnLatticeSimulation<2> simulator(cell_population);
+                    simulator.SetOutputDivisionLocations(true);
 
 
                     //Create output directory
@@ -160,8 +170,8 @@ public:
                     output_directory = main_directory +  out.str();
                     simulator.SetOutputDirectory(output_directory);
 
-                    simulator.SetDt(0.1);
-                    simulator.SetSamplingTimestepMultiple(10);
+                    simulator.SetDt(0.01);
+                    simulator.SetSamplingTimestepMultiple(100);
                     simulator.SetEndTime(time_to_steady_state);
                     simulator.SetOutputCellVelocities(true);
 
@@ -219,6 +229,11 @@ public:
                             cell_iter->SetMutationState(p_state);
                             // Also label cells as using Diff adhesion
                             cell_iter->AddCellProperty(p_label);
+
+                        	RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
+                        	// reset all the cell ages as otherwise the mutant patch will divide straight away as originally old cells
+                        	cell_iter->SetBirthTime(time_to_steady_state - 16* p_gen->ranf() );
+
                         }
                     }
 

@@ -3,6 +3,7 @@
 
 #include <cxxtest/TestSuite.h>
 
+#include "../src/CellSurfaceAreasWriter.hpp"
 // Must be included before other cell_based headers
 #include "CellBasedSimulationArchiver.hpp"
 
@@ -63,7 +64,9 @@ public:
         unsigned crypt_width = 50; //50
         unsigned element_size = 5;
 
-        double end_time = 200; //2200
+
+        double dt = 0.04;// 0.04; 0.02; 0.01, 0.005; 0.0025; 0.00125;
+        double end_time = 2200; //2200
 
         // Create a simple 2D PottsMesh
          PottsMeshGenerator<2> generator(crypt_width, crypt_width/element_size, element_size, crypt_length +10 , crypt_length/element_size, element_size, 1, 1, 1, true, true);
@@ -85,7 +88,8 @@ public:
 
         // Create cell population
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
-        cell_population.SetNumSweepsPerTimestep(10);
+        cell_population.SetNumSweepsPerTimestep(1);
+        cell_population.SetTemperature(0.1); //Default 0.1
 
 
         cell_population.AddCellPopulationCountWriter<CellProliferativeTypesCountWriter>();
@@ -102,11 +106,27 @@ public:
 
         // Set up cell-based simulation
         OnLatticeSimulation<2> simulator(cell_population);
-        simulator.SetOutputDirectory("HomeostaticPottsCrypt");
-        simulator.SetDt(0.1);
-        simulator.SetSamplingTimestepMultiple(10);
+        simulator.SetDt(dt);
+
+
+        if(dt>1.0)
+        {
+        	simulator.SetSamplingTimestepMultiple(1);
+        }
+        else
+        {
+        	simulator.SetSamplingTimestepMultiple((unsigned)(1.0/dt));
+        }
+
         simulator.SetEndTime(end_time);
         simulator.SetOutputCellVelocities(true);
+
+        std::stringstream out;
+		out << "/Dt_" << dt;
+		std::string output_directory = "Potts/HomeostaticCylindricalCrypt" +  out.str();
+		simulator.SetOutputDirectory(output_directory);
+
+
 
 
 
