@@ -30,9 +30,9 @@ There are two folders - `src` and `test`.
   * `MutantBaseTrackerModifier.xpp` - TODO.
   * `MutantCellPottsUpdateRule.xpp` - TODO.
   1. The `test` folder contains:
-  * [wiki:PaperTutorials/PottsCrypt2015/TestPottsCrypt TestPottsCryptLiteratePaper.hpp] - this file can be run to generate the results in Figure TODO.
-  * [wiki:PaperTutorials/PottsCrypt2015/TestPottsCryptMutant TestPottsCryptLiteratePaperMutant.hpp] - this file can be run to generate the results in Figure TODO.
-  * [wiki:PaperTutorials/PottsCrypt2015/TestPottsCryptSweeps TestPottsCryptLiteratePaperSweeps.hpp] - this file can be run to generate the results in Figure TODO.
+  * [wiki:PaperTutorials/PottsCrypt2015/PottsCrypt TestPottsCryptLiteratePaper.hpp] - this file can be run to generate the results in Figure TODO.
+  * [wiki:PaperTutorials/PottsCrypt2015/PottsCryptMutant TestPottsCryptLiteratePaperMutant.hpp] - this file can be run to generate the results in Figure TODO.
+  * [wiki:PaperTutorials/PottsCrypt2015/PottsCryptSweeps TestPottsCryptLiteratePaperSweeps.hpp] - this file can be run to generate the results in Figure TODO.
   
 == Running tests ==
 You can then run tests and simulations with, for example,
