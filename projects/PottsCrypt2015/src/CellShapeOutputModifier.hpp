@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2013, University of Oxford.
+Copyright (c) 2005-2015, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -43,8 +43,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /**
- * An modifier class which at each simulation timestep calculates the fractional length of a
- * cell population and writes it to file.
+ * An modifier class which at each simulation timestep calculates the shape parameter of each cell and writes them to file.
  */
 template<unsigned DIM>
 class CellShapeOutputModifier : public AbstractCellBasedSimulationModifier<DIM,DIM>
@@ -59,8 +58,8 @@ private:
     }
 
 
-    /** The file to which the fractional lengths are written to. DOesnt need archiving as defined in SetupSolve */
-    out_stream mpFractionalLengthsResultsFile;
+    /** The file to which the cell shape are written to. Doesn't need archiving as defined in SetupSolve */
+    out_stream mpCellShapeResultsFile;
 
 public:
 
@@ -108,6 +107,14 @@ public:
      * @param rCellPopulation reference to the cell population
      */
     void CalculateCellShape(AbstractCellPopulation<DIM,DIM>& rCellPopulation);
+
+    /**
+     * Overridden OutputSimulationModifierParameters() method.
+     * Output any simulation modifier parameters to file.
+     *
+     * @param rParamsFile the file stream to which the parameters are output
+     */
+    void OutputSimulationModifierParameters(out_stream& rParamsFile);
 };
 
 #include "SerializationExportWrapper.hpp"
