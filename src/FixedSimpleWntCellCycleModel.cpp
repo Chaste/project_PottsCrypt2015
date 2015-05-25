@@ -40,10 +40,7 @@ OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DifferentiatedCellProliferativeType.hpp"
 
 FixedSimpleWntCellCycleModel::FixedSimpleWntCellCycleModel()
-    : mUseCellProliferativeTypeDependentG1Duration(false),
-      mWntStemThreshold(0.8),
-      mWntTransitThreshold(0.65),
-      mWntLabelledThreshold(0.65)
+    : SimpleWntCellCycleModel()
 {
 }
 
@@ -80,109 +77,6 @@ AbstractCellCycleModel* FixedSimpleWntCellCycleModel::CreateCellCycleModel()
     return p_model;
 }
 
-void FixedSimpleWntCellCycleModel::SetUseCellProliferativeTypeDependentG1Duration(bool useCellProliferativeTypeDependentG1Duration)
-{
-    mUseCellProliferativeTypeDependentG1Duration = useCellProliferativeTypeDependentG1Duration;
-}
-
-void FixedSimpleWntCellCycleModel::SetG1Duration()
-{
-    assert(mpCell != NULL);
-
-    RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-
-    if (mpCell->GetCellProliferativeType()->IsType<StemCellProliferativeType>())
-    {
-        if (mUseCellProliferativeTypeDependentG1Duration)
-        {
-            mG1Duration = p_gen->NormalRandomDeviate(GetStemCellG1Duration(), 1.0);
-        }
-        else
-        {
-            // Normally stem cells should behave just like transit cells in a Wnt simulation
-            mG1Duration = p_gen->NormalRandomDeviate(GetTransitCellG1Duration(), 1.0);
-        }
-    }
-    else if (mpCell->GetCellProliferativeType()->IsType<TransitCellProliferativeType>())
-    {
-        mG1Duration = p_gen->NormalRandomDeviate(GetTransitCellG1Duration(), 1.0);
-    }
-    else if (mpCell->GetCellProliferativeType()->IsType<DifferentiatedCellProliferativeType>())
-    {
-        mG1Duration = DBL_MAX;
-    }
-    else
-    {
-        NEVER_REACHED;
-    }
-
-    // Check that the normal random deviate has not returned a small or negative G1 duration
-    if (mG1Duration < mMinimumGapDuration)
-    {
-        mG1Duration = mMinimumGapDuration;
-    }
-}
-
-double FixedSimpleWntCellCycleModel::GetWntLevel()
-{
-    assert(mpCell != NULL);
-    double level = 0;
-
-    switch (mDimension)
-    {
-        case 1:
-        {
-            const unsigned DIM = 1;
-            level = WntConcentration<DIM>::Instance()->GetWntLevel(mpCell);
-            break;
-        }
-        case 2:
-        {
-            const unsigned DIM = 2;
-            level = WntConcentration<DIM>::Instance()->GetWntLevel(mpCell);
-            break;
-        }
-        case 3:
-        {
-            const unsigned DIM = 3;
-            level = WntConcentration<DIM>::Instance()->GetWntLevel(mpCell);
-            break;
-        }
-        default:
-            NEVER_REACHED;
-    }
-    return level;
-}
-
-WntConcentrationType FixedSimpleWntCellCycleModel::GetWntType()
-{
-    WntConcentrationType wnt_type;
-    switch (mDimension)
-    {
-        case 1:
-        {
-            const unsigned DIM = 1;
-            wnt_type = WntConcentration<DIM>::Instance()->GetType();
-            break;
-        }
-        case 2:
-        {
-            const unsigned DIM = 2;
-            wnt_type = WntConcentration<DIM>::Instance()->GetType();
-            break;
-        }
-        case 3:
-        {
-            const unsigned DIM = 3;
-            wnt_type = WntConcentration<DIM>::Instance()->GetType();
-            break;
-        }
-        default:
-            NEVER_REACHED;
-    }
-    return wnt_type;
-}
-
 void FixedSimpleWntCellCycleModel::UpdateCellCyclePhase()
 {
     // The cell can divide if the Wnt concentration >= wnt_division_threshold
@@ -208,11 +102,13 @@ void FixedSimpleWntCellCycleModel::UpdateCellCyclePhase()
         // should be zero (no Wnt-dependence)
         wnt_division_threshold = 0.0;
 
-        // Reset G1Duration incase cell was previously differenetiated
+        /*******Begin Change *******/
+        // Reset G1Duration in case cell was previously differentiated
         if (mG1Duration == DBL_MAX)
         {
         	SetG1Duration();
         }
+        /*******End Change *******/
     }
     else
     {
@@ -263,70 +159,10 @@ void FixedSimpleWntCellCycleModel::UpdateCellCyclePhase()
     AbstractSimpleCellCycleModel::UpdateCellCyclePhase();
 }
 
-void FixedSimpleWntCellCycleModel::InitialiseDaughterCell()
-{
-    WntConcentrationType wnt_type = GetWntType();
-
-    if (wnt_type == RADIAL)
-    {
-        boost::shared_ptr<AbstractCellProperty> p_transit_type =
-            mpCell->rGetCellPropertyCollection().GetCellPropertyRegistry()->Get<TransitCellProliferativeType>();
-        mpCell->SetCellProliferativeType(p_transit_type);
-    }
-
-    AbstractSimpleCellCycleModel::InitialiseDaughterCell();
-}
-
-bool FixedSimpleWntCellCycleModel::CanCellTerminallyDifferentiate()
-{
-    return false;
-}
-
-double FixedSimpleWntCellCycleModel::GetWntStemThreshold()
-{
-    return mWntStemThreshold;
-}
-
-void FixedSimpleWntCellCycleModel::SetWntStemThreshold(double wntStemThreshold)
-{
-    assert(wntStemThreshold <= 1.0);
-    assert(wntStemThreshold >= 0.0);
-    mWntStemThreshold = wntStemThreshold;
-}
-
-double FixedSimpleWntCellCycleModel::GetWntTransitThreshold()
-{
-    return mWntTransitThreshold;
-}
-
-void FixedSimpleWntCellCycleModel::SetWntTransitThreshold(double wntTransitThreshold)
-{
-    //assert(wntTransitThreshold <= 1.0);
-    //assert(wntTransitThreshold >= 0.0);
-    mWntTransitThreshold = wntTransitThreshold;
-}
-
-double FixedSimpleWntCellCycleModel::GetWntLabelledThreshold()
-{
-    return mWntLabelledThreshold;
-}
-
-void FixedSimpleWntCellCycleModel::SetWntLabelledThreshold(double wntLabelledThreshold)
-{
-//    assert(wntLabelledThreshold <= 1.0);
-//    assert(wntLabelledThreshold >= 0.0);
-    mWntLabelledThreshold = wntLabelledThreshold;
-}
-
 void FixedSimpleWntCellCycleModel::OutputCellCycleModelParameters(out_stream& rParamsFile)
 {
-    *rParamsFile << "\t\t\t<UseCellProliferativeTypeDependentG1Duration>" << mUseCellProliferativeTypeDependentG1Duration << "</UseCellProliferativeTypeDependentG1Duration>\n";
-    *rParamsFile << "\t\t\t<WntStemThreshold>" << mWntStemThreshold << "</WntStemThreshold>\n";
-    *rParamsFile << "\t\t\t<WntTransitThreshold>" << mWntTransitThreshold << "</WntTransitThreshold>\n";
-    *rParamsFile << "\t\t\t<WntLabelledThreshold>" << mWntLabelledThreshold << "</WntLabelledThreshold>\n";
-
     // Call method on direct parent class
-    AbstractSimpleCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
+    SimpleWntCellCycleModel::OutputCellCycleModelParameters(rParamsFile);
 }
 
 // Serialization for Boost >= 1.36

@@ -1,5 +1,5 @@
-#ifndef TESTPOTTSCRYPT_HPP_
-#define TESTPOTTSCRYPT_HPP_
+#ifndef TESTPOTTSCRYPTSWEEP_HPP_
+#define TESTPOTTSCRYPTSWEEP_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -212,4 +212,4 @@ public:
     }
 };
 
-#endif /*TESTPOTTSCRYPT_HPP_*/
+#endif /*TESTPOTTSCRYPTSWEEP_HPP_*/

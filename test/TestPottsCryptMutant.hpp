@@ -80,11 +80,11 @@ public:
 
         double blob_radius = 10.0; // Lattice sites so 2 CDs
 
-        unsigned num_blob_heights = 2;
+        unsigned num_blob_heights = 1;
         double blob_heights[2] = {20.0,60.0}; // Lattice sites so 4 and 12 CDs
 
 
-        unsigned num_drag_ratios = 19;
+        unsigned num_drag_ratios = 1;
         double drag_ratios[19] = {1.0, 1.5, 2.0, 2.5, 3.0,3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0};
 
         for(unsigned index=start_index; index < start_index + num_runs; index++)

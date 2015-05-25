@@ -1,0 +1,48 @@
+= A Cellular Potts Model (CPM) of Colorectal Cancer =
+
+Designed only to work as bolt-on project for Chaste v3.2 or v3.3.
+
+This section contains pages generated automatically from the source code accompanying "A Multiscale Model of Colorectal Cancer Using the Cellular Potts Framework "
+== Getting the code and installing dependencies ==
+
+Before running these examples you will need to [wiki:InstallGuides/InstallGuide install Chaste's dependencies] and the [http://www.cs.ox.ac.uk/chaste/download.html source code for version 3.3].
+The easiest way to do this is using an Ubuntu machine (or an Ubuntu virtual machine) as discussed on [wiki:InstallGuides/UbuntuPackage]. 
+Note that Chaste is only fully supported on !Linux/Unix systems, so users of Windows or Mac OS X may need to follow the virtual machine route.
+For manual installation of each dependency, on any version of Linux, see DeveloperInstallGuide.
+
+You will also need the source for the PottsCrypt2015 project. It is available from the [http://www.cs.ox.ac.uk/chaste/download.html main Chaste download page] as extension to Chaste release 3.3 under the "Bolt-on projects" heading.
+Move the project in Chaste/projects where 'Chaste' is the folder containing the Chaste source code.
+
+Now the project should be installed, and everything should compile and run correctly. In order to
+test if everything is installed correctly, you can run some tests. So from a command line do:
+{{{
+cd <Chaste3.3 path>
+scons test_suite=projects/PottdCrypt2015/test/TestPottsCrypt.hpp
+}}}
+
+If each test run is passed, you can run some tests or simulations, or create your own test suites.
+
+== Documentation ==
+There are two folders - `src` and `test`.
+ 1. The `src` folder contains the following classes:
+  * `CellShapeOutputModifier.xpp` - TODO.
+  * `FixedSimpleWntCellCycleModel.xpp` - TODO.
+  * `MutantBaseTrackerModifier.xpp` - TODO.
+  * `MutantCellPottsUpdateRule.xpp` - TODO.
+  1. The `test` folder contains:
+  * [wiki:PaperTutorials/PottsCrypt2015/TestPottsCrypt TestPottsCryptLiteratePaper.hpp] - this file can be run to generate the results in Figure TODO.
+  * [wiki:PaperTutorials/PottsCrypt2015/TestPottsCryptMutant TestPottsCryptLiteratePaperMutant.hpp] - this file can be run to generate the results in Figure TODO.
+  * [wiki:PaperTutorials/PottsCrypt2015/TestPottsCryptSweeps TestPottsCryptLiteratePaperSweeps.hpp] - this file can be run to generate the results in Figure TODO.
+  
+== Running tests ==
+You can then run tests and simulations with, for example,
+{{{
+cd <Chaste3.3 path>
+scons b=GccOpt ts=projects/PottsCrypt2015/test/TestPottsCryptLiteratePaper.hpp
+}}}
+
+----
+'''NB''': the paper was developed with release version 3.2 and 3.3. We have not tested the compatibility with release version 3.1 or under.
+
+For further information on using Chaste, see [wiki:ChasteGuides extensive guide material].
+You may also wish to look at some of the [wiki:UserTutorials basic user tutorials].
