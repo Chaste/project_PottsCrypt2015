@@ -28,6 +28,8 @@
 #include "CellVolumesWriter.hpp"
 #include "CellIdWriter.hpp"
 
+#include "CellShapeOutputModifier.hpp"
+
 #include "SloughingCellKiller.hpp"
 #include "OnLatticeSimulation.hpp"
 #include "OffLatticeSimulation.hpp"
@@ -65,7 +67,7 @@ public:
         unsigned element_size = 5;
 
 
-        double dt = 0.04;// 0.04; 0.02; 0.01, 0.005; 0.0025; 0.00125;
+        double dt = 0.01;// 0.04; 0.02; 0.01, 0.005; 0.0025; 0.00125;
         double end_time = 2200; //2200
 
         // Create a simple 2D PottsMesh
@@ -141,6 +143,11 @@ public:
         simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
         MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule);
         simulator.AddPottsUpdateRule(p_adhesion_update_rule);
+
+        MAKE_PTR(CellShapeOutputModifier<2>, p_cell_shape_modifier);
+        simulator.AddSimulationModifier(p_cell_shape_modifier);
+
+
 
         // Run simulation
         simulator.Solve();

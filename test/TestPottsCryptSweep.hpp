@@ -3,38 +3,29 @@
 
 #include <cxxtest/TestSuite.h>
 
-#include "../src/CellSurfaceAreasWriter.hpp"
 // Must be included before other cell_based headers
 #include "CellBasedSimulationArchiver.hpp"
 
 #include "TransitCellProliferativeType.hpp"
-#include "HoneycombMeshGenerator.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
 #include "WntConcentration.hpp"
 #include "SimpleWntCellCycleModel.hpp"
-#include "FixedDurationGenerationBasedCellCycleModel.hpp"
-#include "StochasticDurationGenerationBasedCellCycleModel.hpp"
-#include "WildTypeCellMutationState.hpp"
 #include "PottsBasedCellPopulation.hpp"
-#include "NodeBasedCellPopulation.hpp"
 #include "VolumeConstraintPottsUpdateRule.hpp"
 #include "AdhesionPottsUpdateRule.hpp"
-#include "DifferentialAdhesionPottsUpdateRule.hpp"
 #include "SloughingCellKiller.hpp"
-#include "ElementRemovedCellKiller.hpp"
 #include "OnLatticeSimulation.hpp"
-#include "OffLatticeSimulation.hpp"
 
 #include "CellProliferativeTypesCountWriter.hpp"
 #include "CellProliferativeTypesWriter.hpp"
 #include "CellMutationStatesWriter.hpp"
+#include "CellVolumesWriter.hpp"
 #include "CellIdWriter.hpp"
 #include "Warnings.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "SmartPointers.hpp"
 #include "PetscSetupAndFinalize.hpp"
-
 #include "Debug.hpp"
 
 class TestPottsCrypt : public AbstractCellBasedTestSuite
@@ -60,28 +51,23 @@ public:
 
     void TestMultiplePottsCrypt() throw (Exception)
     {
+    	// Change to get different random seeds
         unsigned start_sim = 1;
-        unsigned num_sims = 5; //10
-     	double mid_time = 25; //100
-     	double end_time = 50; //200
+        unsigned num_sims = 1; //10
+
+     	double mid_time = 25;
+     	double end_time = 50;
 
 
      	double cuberoot10 = 2.15443469;
 
      	double temp[10] = {0.001, 0.001*cuberoot10, 0.001*cuberoot10*cuberoot10, 0.01, 0.01*cuberoot10, 0.01*cuberoot10*cuberoot10, 0.1, 0.1*cuberoot10, 0.1*cuberoot10*cuberoot10, 1.0};// 3.1623, 10.0}; // 31.623, 100};
         unsigned max_temp_index = 10;
-     	//double temp[4] = {0.001, 0.01, 0.1, 1.0};
-     	//unsigned max_temp_index = 4;
-
-
 
      	double dt[7] = {0.1, 0.01*cuberoot10*cuberoot10, 0.01*cuberoot10,  0.01, 0.001*cuberoot10*cuberoot10, 0.001*cuberoot10, 0.001};
         unsigned max_dt_index = 7;
-     	//double dt[6] = {1, 0.1/3.0, 0.1/10.0, 0.1/30.0, 0.1/100.0, 0.1/300.0};
-     	//unsigned max_dt_index = 6;
 
-
-     	// Stuff to output the number of cells in the crypt to a dat file.
+     	// Code to output the number of cells in the crypt to a dat file.
         /** Results file cell velocities. */
         out_stream p_cell_number_file;
         OutputFileHandler output_file_handler("Potts/CylindricalCrypt/Sweeps/", false);
@@ -100,6 +86,7 @@ public:
 		     	double number_of_cells_in_middle = 0.0;
 		     	double number_of_cells_at_end = 0.0;
 
+		     	// Loop over seed
 			    for(unsigned index=start_sim; index < start_sim + num_sims; index++)
 				{
 					std::cout << " Run number " << index << "... " << std::flush;
@@ -148,7 +135,7 @@ public:
 					// Set up cell-based simulation
 					OnLatticeSimulation<2> simulator(cell_population);
 					simulator.SetDt(dt[dt_index]);
-					simulator.SetSamplingTimestepMultiple((unsigned)(5.0/dt[dt_index]));
+					simulator.SetSamplingTimestepMultiple((unsigned)(1.0/dt[dt_index]));
 					simulator.SetOutputCellVelocities(true);
 
 					//Create output directory
@@ -160,9 +147,6 @@ public:
 					// Create cell killer and pass in to simulation
 					MAKE_PTR_ARGS(SloughingCellKiller<2>, p_sloughing_killer, (&cell_population, crypt_length));
 					simulator.AddCellKiller(p_sloughing_killer);
-
-//					MAKE_PTR_ARGS(ElementRemovedCellKiller<2>, p_killer, (&cell_population));
-//					simulator.AddCellKiller(p_killer);
 
 					// Create update rules and pass to the simulation
 					MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
@@ -177,11 +161,9 @@ public:
 					simulator.Solve();
 
 					// Get number of elements of non zero size
-
-
 					PottsMesh<2>& potts_mesh = static_cast<PottsMesh<2>&>(simulator.rGetCellPopulation().rGetMesh());
 					unsigned local_num_cells_in_middle=0;
-					for (typename PottsMesh<2>::PottsElementIterator elem_iter = potts_mesh.GetElementIteratorBegin();
+					for (PottsMesh<2>::PottsElementIterator elem_iter = potts_mesh.GetElementIteratorBegin();
 					   elem_iter != potts_mesh.GetElementIteratorEnd();
 					   ++elem_iter)
 					{
@@ -201,7 +183,7 @@ public:
 					PottsMesh<2>& potts_mesh_end = static_cast<PottsMesh<2>&>(simulator.rGetCellPopulation().rGetMesh());
 
 					unsigned local_num_cells_at_end=0;
-					for (typename PottsMesh<2>::PottsElementIterator elem_iter = potts_mesh_end.GetElementIteratorBegin();
+					for (PottsMesh<2>::PottsElementIterator elem_iter = potts_mesh_end.GetElementIteratorBegin();
 					   elem_iter != potts_mesh_end.GetElementIteratorEnd();
 					   ++elem_iter)
 					{
@@ -221,12 +203,6 @@ public:
 					*p_cell_number_file << temp[temp_index] << "\t" << dt[dt_index] << "\t" << index << "\t" << local_num_cells_in_middle << "\t" << local_num_cells_at_end << "\n";
 
 				}
-
-//			    number_of_cells_in_middle  /= (double) num_sims;
-//			    number_of_cells_at_end  /= (double) num_sims;
-
-				//*p_cell_number_file << temp[temp_index] << "\t" << dt[dt_index] << "\t" << number_of_cells_in_middle << "\t" << number_of_cells_at_end << "\n";
-
 				number_of_cells_in_middle = 0.0;
 			    number_of_cells_at_end = 0.0;
 			}
