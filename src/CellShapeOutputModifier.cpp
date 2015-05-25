@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2005-2013, University of Oxford.
+Copyright (c) 2005-2015, University of Oxford.
 All rights reserved.
 
 University of Oxford means the Chancellor, Masters and Scholars of the
@@ -55,7 +55,7 @@ CellShapeOutputModifier<DIM>::~CellShapeOutputModifier()
 template<unsigned DIM>
 void CellShapeOutputModifier<DIM>::UpdateAtEndOfOutputTimeStep(AbstractCellPopulation<DIM,DIM>& rCellPopulation)
 {
-    CalculateFractionalLength(rCellPopulation);
+	CalculateCellShape(rCellPopulation);
 }
 
 template<unsigned DIM>
@@ -65,11 +65,8 @@ void CellShapeOutputModifier<DIM>::SetupSolve(AbstractCellPopulation<DIM,DIM>& r
 	OutputFileHandler output_file_handler( outputDirectory + "/", false);
     mpCellShapeResultsFile = output_file_handler.OpenOutputFile("cellshapes.dat");
 
-    // Write Headers
-    *mpCellShapeResultsFile <<  "time \t fractional length \t total length \n";
-
     // Calculate before 1st timestep.
-    CalculateFractionalLength(rCellPopulation);
+    CalculateCellShape(rCellPopulation);
 }
 
 
@@ -93,23 +90,26 @@ void CellShapeOutputModifier<DIM>::CalculateCellShape(AbstractCellPopulation<DIM
 		PottsMesh<DIM>* p_potts_mesh = (&(dynamic_cast<PottsBasedCellPopulation<DIM>*>(&rCellPopulation)->rGetMesh()));
 
 		// Loop over cells and find associated elements so in the same order as the cells in output files
-		for (typename AbstractCellPopulation<SPACE_DIM, SPACE_DIM>::Iterator cell_iter = pCellPopulation->Begin();
-			 cell_iter != pCellPopulation->End();
+		for (typename AbstractCellPopulation<DIM, DIM>::Iterator cell_iter = rCellPopulation.Begin();
+			 cell_iter != rCellPopulation.End();
 			 ++cell_iter)
 		{
 
-			unsigned location_index = pCellPopulation->GetLocationIndexUsingCell(cell_iter);
+
+			unsigned location_index = rCellPopulation.GetLocationIndexUsingCell(*cell_iter);
 			unsigned cell_id = cell_iter->GetCellId();
-			c_vector<double, SPACE_DIM> centre_location = pCellPopulation->GetLocationOfCellCentre(cell_iter);
+			c_vector<double, DIM> centre_location = rCellPopulation.GetLocationOfCellCentre(*cell_iter);
 			double surface_area = p_potts_mesh->GetSurfaceAreaOfElement(location_index);
 			double volume = p_potts_mesh->GetVolumeOfElement(location_index);
+			double mutation_state = cell_iter->GetMutationState()->GetColour();
+
 
 			*mpCellShapeResultsFile << location_index << "\t" << cell_id << "\t";
-			for (unsigned i=0; i<SPACE_DIM; i++)
+			for (unsigned i=0; i<DIM; i++)
 			{
 				*mpCellShapeResultsFile << centre_location[i] << "\t";
 			}
-			*mpCellShapeResultsFile << volume <<surface_area << "\t";
+			*mpCellShapeResultsFile << volume << "\t" <<surface_area << "\t" << mutation_state << "\t";
 		}
 	}
 
@@ -122,6 +122,12 @@ void CellShapeOutputModifier<DIM>::CalculateCellShape(AbstractCellPopulation<DIM
     *mpCellShapeResultsFile << "\n";
 }
 
+template<unsigned DIM>
+void CellShapeOutputModifier<DIM>::OutputSimulationModifierParameters(out_stream& rParamsFile)
+{
+    // No parameters to output, so just call method on direct parent class
+    AbstractCellBasedSimulationModifier<DIM>::OutputSimulationModifierParameters(rParamsFile);
+}
 
 
 /////////////////////////////////////////////////////////////////////////////
