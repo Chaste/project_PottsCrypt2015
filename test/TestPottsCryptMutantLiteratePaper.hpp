@@ -1,5 +1,5 @@
-#ifndef TESTPOTTSCRYPTMUTANT_HPP_
-#define TESTPOTTSCRYPTMUTANT_HPP_
+#ifndef TESTPOTTSCRYPTMUTANTLITERATEPAPER_HPP_
+#define TESTPOTTSCRYPTMUTANTLITERATEPAPER_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -233,7 +233,7 @@ public:
                     p_mutant_cell_update_rule->SetMutantCellMovementRatio(drag_ratios[drag_index]);
                     simulator.AddPottsUpdateRule(p_mutant_cell_update_rule);
 
-                    // In order to catch runs with poor motility arameters
+                    // In order to catch runs with poor motility parameters
                     try
                     {
                     	simulator.Solve();
@@ -255,4 +255,4 @@ public:
     }
 };
 
-#endif /*TESTPOTTSCRYPTMUTANT_HPP_*/
+#endif /*TESTPOTTSCRYPTMUTANTLITERATEPAPER_HPP_*/
