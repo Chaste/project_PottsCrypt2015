@@ -10,7 +10,7 @@
  *
  * In this test we show how Chaste can be used to simulate a Cellular Potts model of a
  * healthy colon crypt. Full details of the computational model can be found in
- * Osborne (2015).
+ * Osborne (2015) "A Multiscale Model of Colorectal Cancer Using the Cellular Potts Framework".
  *
  * This class was used to produce the data for Figures 2 and 3
  *
@@ -24,7 +24,7 @@
 #include <cxxtest/TestSuite.h>
 #include "CellBasedSimulationArchiver.hpp"
 
-/* This header includes the Modifier too enable cell shape tracking and can be found in the src folder. */
+/* This header includes the Modifier to enable cell shape tracking and can be found in the src folder. */
 #include "CellShapeOutputModifier.hpp"
 
 /* The remaining headers are covered in the regular Chaste tutorials */
@@ -77,7 +77,7 @@ public:
         double end_time = 100; //2200
 
 
-        /* Create a simple 2D PottsMesh, this is the spatial information for the cells. */
+        /* Create a simple 2D `PottsMesh`, this is the spatial information for the cells. */
         PottsMeshGenerator<2> generator(crypt_width, crypt_width/element_size, element_size, crypt_length +10 , crypt_length/element_size, element_size, 1, 1, 1, true, true);
         PottsMesh<2>* p_mesh = generator.GetMesh();
 
@@ -95,7 +95,7 @@ public:
             dynamic_cast<SimpleWntCellCycleModel*>(cells[i]->GetCellCycleModel())->SetWntTransitThreshold(2.0/3.0);
         }
 
-        /* Create a cell population to associate the cells with the PottsMesh. */
+        /* Create a cell population to associate the cells with the `PottsMesh`. */
         PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
         cell_population.SetNumSweepsPerTimestep(1); //Default is 1
         cell_population.SetTemperature(0.1); //Default is 0.1
@@ -105,7 +105,7 @@ public:
         cell_population.AddCellWriter<CellProliferativeTypesWriter>();
         cell_population.AddCellWriter<CellMutationStatesWriter>();
         cell_population.AddCellWriter<CellVolumesWriter>();
-		cell_population.AddCellWriter<CellIdWriter>();
+        cell_population.AddCellWriter<CellIdWriter>();
 
 
         /* Create an instance of a Wnt concentration, this controls the threshold of cell proliferation. */
@@ -128,7 +128,7 @@ public:
         simulator.SetEndTime(end_time);
         simulator.SetOutputCellVelocities(true);
 
-		simulator.SetOutputDirectory("Potts/HomeostaticCylindricalCrypt");
+        simulator.SetOutputDirectory("Potts/HomeostaticCylindricalCrypt");
 
         /* Create cell killer and pass in to simulation, this specifies how cells die,
          * here they are removed at the top of the crypt. */
