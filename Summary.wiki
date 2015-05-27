@@ -2,7 +2,7 @@
 
 Designed only to work as bolt-on project for Chaste v3.2 or v3.3.
 
-This section contains pages generated automatically from the source code accompanying "A Multiscale Model of Colorectal Cancer Using the Cellular Potts Framework "
+This section contains pages generated automatically from the source code accompanying "A Multiscale Model of Colorectal Cancer Using the Cellular Potts Framework"
 
 == Getting the code and installing dependencies ==
 
@@ -32,18 +32,18 @@ There are two folders - `src` and `test`.
   * [wiki:PaperTutorials/PottsCrypt2015/PottsCryptSweeps TestPottsCryptSweepsLiteratePaper.hpp] - this file can be run to generate the results in Figure 4.
   * [wiki:PaperTutorials/PottsCrypt2015/PottsCryptMutant TestPottsCryptMutantLiteratePaper.hpp] - this file can be run to generate the results in Figures 5 6 and 7.
 == Running tests ==
-You can then run tests and simulations with, for example,
+You can then run tests and simulations with,
 {{{
 cd <Chaste3.3 path>
 scons b=GccOpt ts=projects/PottsCrypt2015/test/TestPottsCryptLiteratePaper.hpp
 }}}
 and 
 {{{
-scons b=GccOpt ts=projects/PottsCrypt2015/test/TestPottsCryptLiteratePaper.hpp
+scons b=GccOpt ts=projects/PottsCrypt2015/test/TestPottsCryptSweepLiteratePaper.hpp
 }}}
 and
 {{{
-scons b=GccOpt ts=projects/PottsCrypt2015/test/TestPottsCryptLiteratePaper.hpp
+scons b=GccOpt ts=projects/PottsCrypt2015/test/TestPottsCryptMutantLiteratePaper.hpp
 }}}
 ----
 '''NB''': the paper was developed with release version 3.2 and 3.3. It will not work with with release version 3.1 or under.
