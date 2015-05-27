@@ -2,7 +2,7 @@
 #define TESTPOTTSCRYPTMUTANTLITERATEPAPER_HPP_
 
 /*
- * = CPM simulation of a crypt with Mutant Cells =
+ * = Mutliple CPM simulations of a crypt with Mutant Cells =
  *
  * == Introduction ==
  *
@@ -12,7 +12,7 @@
  * colon crypt with mutant cells. Full details of the computational model can be found in
  * Osborne (2015) "A Multiscale Model of Colorectal Cancer Using the Cellular Potts Framework".
  *
- * This class was used to produce the data for Figures 5, 6 and 7
+ * This class was used to produce the data for Figures 5, 6 and 7.
  *
  * == Including header files ==
  *
@@ -232,7 +232,7 @@ public:
 
                         if (dist_from_blob_centre < blob_radius)
                         {
-                        	cell_iter->SetMutationState(p_state);
+                            cell_iter->SetMutationState(p_state);
                             // Also label cells as using Diff adhesion
                             cell_iter->AddCellProperty(p_label);
 
