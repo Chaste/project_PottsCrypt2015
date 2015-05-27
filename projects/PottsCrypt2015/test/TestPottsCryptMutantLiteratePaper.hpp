@@ -1,13 +1,37 @@
 #ifndef TESTPOTTSCRYPTMUTANTLITERATEPAPER_HPP_
 #define TESTPOTTSCRYPTMUTANTLITERATEPAPER_HPP_
 
+/*
+ * = CPM simulation of a crypt with Mutant Cells =
+ *
+ * == Introduction ==
+ *
+ * EMPTYLINE
+ *
+ * In this test we show how Chaste can be used to simulate a Cellular Potts model of a
+ * colon crypt with mutant cells. Full details of the computational model can be found in
+ * Osborne (2015) "A Multiscale Model of Colorectal Cancer Using the Cellular Potts Framework".
+ *
+ * This class was used to produce the data for Figures 5, 6 and 7
+ *
+ * == Including header files ==
+ *
+ * EMPTYLINE
+ *
+ * We begin by including the necessary header files.
+ */
+
 #include <cxxtest/TestSuite.h>
 
 // Must be included before other cell_based headers
 #include "CellBasedSimulationArchiver.hpp"
 
+/* These header includes the Modifiers to enable cell shape and mutant cell tracking and also the model for mutant cell movement, and can be found in the src folder. */
 #include "MutantBaseTrackerModifier.hpp"
 #include "CellShapeOutputModifier.hpp"
+#include "MutantCellPottsUpdateRule.hpp"
+
+/* The remaining headers are covered in the regular Chaste tutorials */
 #include "TransitCellProliferativeType.hpp"
 #include "PottsMeshGenerator.hpp"
 #include "CellsGenerator.hpp"
@@ -16,17 +40,14 @@
 #include "PottsBasedCellPopulation.hpp"
 #include "VolumeConstraintPottsUpdateRule.hpp"
 #include "DifferentialAdhesionPottsUpdateRule.hpp"
-#include "MutantCellPottsUpdateRule.hpp"
 #include "SloughingCellKiller.hpp"
 #include "OnLatticeSimulation.hpp"
-
 #include "CellProliferativeTypesCountWriter.hpp"
 #include "CellMutationStatesCountWriter.hpp"
 #include "CellProliferativeTypesWriter.hpp"
 #include "CellMutationStatesWriter.hpp"
 #include "CellIdWriter.hpp"
 #include "CellVolumesWriter.hpp"
-
 #include "Warnings.hpp"
 #include "AbstractCellBasedTestSuite.hpp"
 #include "SmartPointers.hpp"
@@ -34,30 +55,22 @@
 #include "CommandLineArguments.hpp"
 #include "Debug.hpp"
 
+
+
+/* == Running Multiple Simulations ==
+ *
+ * EMPTYLINE
+ *
+ * First of all, we define the test class.
+ */
 class TestPottsCryptMutant : public AbstractCellBasedTestSuite
 {
-private:
-
-    double mLastStartTime;
-    void setUp()
-    {
-        mLastStartTime = std::clock();
-        AbstractCellBasedTestSuite::setUp();
-    }
-    void tearDown()
-    {
-        double time = std::clock();
-        double elapsed_time = (time - mLastStartTime)/(CLOCKS_PER_SEC);
-        std::cout << "Elapsed time: " << elapsed_time << std::endl;
-        AbstractCellBasedTestSuite::tearDown();
-    }
-
 public:
 
     void TestMultipleMutantPottsCrypts() throw (Exception)
     {
 
-    	// Uncoment these lines to make an executable with arguments, useful for sweeping
+    	/* You can uncoment these lines to make an executable with arguments, useful for sweeping */
 
 //        TS_ASSERT(CommandLineArguments::Instance()->OptionExists("-run_index"));
 //        unsigned start_index = CommandLineArguments::Instance()->GetUnsignedCorrespondingToOption("-run_index");
@@ -68,6 +81,7 @@ public:
     	unsigned start_index = 0;
     	unsigned num_runs = 1;
 
+    	/* This is effectively the same as the  `PottsCryptSweeps` simulations but with different parameters being varied.*/
         std::string main_directory = "PottsCryptMutant/";
         std::string steady_state_output_directory, output_directory;
 
@@ -87,35 +101,37 @@ public:
         unsigned num_drag_ratios = 1;
         double drag_ratios[19] = {1.0, 1.5, 2.0, 2.5, 3.0,3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0};
 
+        /* Loop over random seed. */
         for(unsigned index=start_index; index < start_index + num_runs; index++)
         {
             std::cout << "\nExperiment number " << index << "... " << std::flush;
 
-            // loop over drag
+            /* loop over drag. */
             for (unsigned drag_index= 0; drag_index < num_drag_ratios; drag_index++)
             {
                 std::cout << "Drag " << drag_ratios[drag_index] << ", " << std::flush;
 
-                // loop over mutation blob heights
+                /* loop over mutation blob heights. */
                 for (unsigned height_index=0; height_index < num_blob_heights; height_index++)
                 {
                     std::cout << "Height " << blob_heights[height_index] << "... " << std::flush;
 
-                    // To be extra careful, we reseed the random number generator
+                    /* We reseed the random number generator so we can calculate the averages in Figures 5 and 6.  */
                     RandomNumberGenerator::Instance()->Reseed(100*index);
 
-                    // Create a simple 2D PottsMesh
+                    /* Create a simple 2D PottsMesh.*/
                     PottsMeshGenerator<2> generator(crypt_width, crypt_width/element_size, element_size, crypt_length +10 , crypt_length/element_size, element_size, 1, 1, 1, true, true);
                     PottsMesh<2>* p_mesh = generator.GetMesh();
 
-                    MAKE_PTR(TransitCellProliferativeType, p_transit_type);
 
-                    // Create cells
+
+                    /* Create some cells */
+                    MAKE_PTR(TransitCellProliferativeType, p_transit_type);
                     std::vector<CellPtr> cells;
                     CellsGenerator<FixedSimpleWntCellCycleModel, 2> cells_generator;
                     cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
 
-                    // Alter cells properties
+                    /* Alter cells properties. */
                     for (unsigned i=0; i<cells.size(); i++)
                     {
                     	// So N(16,1) as in Phil trans paper
@@ -127,7 +143,7 @@ public:
                     boost::shared_ptr<AbstractCellProperty> p_state(CellPropertyRegistry::Instance()->Get<ApcTwoHitCellMutationState>());
                     boost::shared_ptr<AbstractCellProperty> p_label(CellPropertyRegistry::Instance()->Get<CellLabel>());
 
-                    // Create cell population
+                    /* Create cell population. */
                     PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
                     cell_population.SetNumSweepsPerTimestep(1);
 
@@ -138,17 +154,17 @@ public:
 			        cell_population.AddCellWriter<CellVolumesWriter>();
 					cell_population.AddCellWriter<CellIdWriter>();
 
-                    // Create an instance of a Wnt concentration
+                    /* As before, create an instance of a Wnt concentration. */
                     WntConcentration<2>::Instance()->SetType(LINEAR);
                     WntConcentration<2>::Instance()->SetCellPopulation(cell_population);
                     WntConcentration<2>::Instance()->SetCryptLength(crypt_length);
 
-                    // Set up cell-based simulation
+                    /* Set up cell-based simulation. */
                     OnLatticeSimulation<2> simulator(cell_population);
                     simulator.SetOutputDivisionLocations(true);
 
 
-                    //Create output directory
+                    /* Create output directory, this is based on the loops. */
                     std::stringstream out;
                     out << index << "/Drag_"<< drag_ratios[drag_index] << "/Height_" << blob_heights[height_index];
                     output_directory = main_directory +  out.str();
@@ -159,17 +175,17 @@ public:
                     simulator.SetEndTime(time_to_steady_state);
                     simulator.SetOutputCellVelocities(true);
 
-                    // Create cell killer and pass in to simulation
+                    /* Create cell killer and pass in to simulation. */
                     MAKE_PTR_ARGS(SloughingCellKiller<2>, p_killer, (&cell_population, crypt_length));
                     simulator.AddCellKiller(p_killer);
 
-                    // Create update rules and pass to the simulation
+                    /* Create update rules and pass to the simulation. */
                     MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
                     p_volume_constraint_update_rule->SetMatureCellTargetVolume(25);
                     p_volume_constraint_update_rule->SetDeformationEnergyParameter(0.1); //Default is 0.5
                     simulator.AddPottsUpdateRule(p_volume_constraint_update_rule);
 
-                    // DA update rule
+                    /* Here we include a `DifferentialAdhesionUpdateRule` as there are mutant cells.*/
                     MAKE_PTR(DifferentialAdhesionPottsUpdateRule<2>, p_differential_adhesion_update_rule);
                     p_differential_adhesion_update_rule->SetLabelledCellLabelledCellAdhesionEnergyParameter(0.1);
                     p_differential_adhesion_update_rule->SetLabelledCellCellAdhesionEnergyParameter(0.2);
@@ -178,27 +194,26 @@ public:
                     p_differential_adhesion_update_rule->SetCellBoundaryAdhesionEnergyParameter(0.2);
                     simulator.AddPottsUpdateRule(p_differential_adhesion_update_rule);
 
-                    // Moidifier to track base and top of mutant Patch
+                    /* Add a Moidifier to track base and top of mutant Patch. */
                     MAKE_PTR(MutantBaseTrackerModifier<2>, p_base_tracker_modifier);
                     simulator.AddSimulationModifier(p_base_tracker_modifier);
 
-                    // Modifier to track shape of cells
+                    /* Add a Modifier to track shape of cells. */
                     MAKE_PTR(CellShapeOutputModifier<2>, p_cell_shape_modifier);
                     simulator.AddSimulationModifier(p_cell_shape_modifier);
 
 
-                    // Run simulation to steady state
+                    /* Run the simulation to steady state.*/
                     simulator.Solve();
 
-                    // Now reset and add mutant cells
+                    /* Now reset and add mutant cells.*/
                     simulator.SetEndTime(time_to_steady_state + time_after_mutations);
 
-                    // Create some mutant cells
                     c_vector<double, 2> blob_centre;
                     blob_centre[0] = ((double) crypt_width)/ 2.0;
                     blob_centre[1] = blob_heights[height_index];
 
-                    // Iterate over all cells, to define the 'blob'
+                    /* Iterate over all cells, to define the 'blob'. */
                     PottsBasedCellPopulation<2>* p_static_cast_cell_population = static_cast<PottsBasedCellPopulation<2>*>(&(simulator.rGetCellPopulation()));
 
                     for (AbstractCellPopulation<2>::Iterator cell_iter = cell_population.Begin();
@@ -228,12 +243,12 @@ public:
                         }
                     }
 
-                    // Modify movement of mutant cells with a new update rule
+                    /* Modify movement of mutant cells with a new update rule */
                     MAKE_PTR(MutantCellPottsUpdateRule<2>, p_mutant_cell_update_rule);
                     p_mutant_cell_update_rule->SetMutantCellMovementRatio(drag_ratios[drag_index]);
                     simulator.AddPottsUpdateRule(p_mutant_cell_update_rule);
 
-                    // In order to catch runs with poor motility parameters
+                    /* In order to catch runs with poor motility parameters, we use the following to run the simulations.*/
                     try
                     {
                     	simulator.Solve();
@@ -244,7 +259,7 @@ public:
                         PRINT_VARIABLE(output_directory);
                     }
 
-                    // Reset singletons as in loop
+                    /* Finally we reset singletons as we're running Multiple simulations in a loop. */
                     SimulationTime::Destroy();
                     RandomNumberGenerator::Destroy();
                     SimulationTime::Instance()->SetStartTime(0.0);
@@ -253,6 +268,12 @@ public:
             }
         }
     }
+    /* With the parameters as above the simulation will take about an hour.
+     *
+	 * The data to reproduce Figures 5 6 and 7 can be generated by running this simulation for more random seeds and averaging the results ad described in the paper.
+	 * The data is in {{{.dat}}} files in the sub folders of {{{/tmp/$USER/testoutput/Potts/PottsCryptMutant/}}}.
+	 */
+
 };
 
 #endif /*TESTPOTTSCRYPTMUTANTLITERATEPAPER_HPP_*/
