@@ -1,9 +1,28 @@
 #ifndef TESTPOTTSCRYPTSWEEPLITERATEPAPER_HPP_
 #define TESTPOTTSCRYPTSWEEPLITERATEPAPER_HPP_
-
+/*
+ * = Multiple CPM simulations of a healty crypt with varying dynamic parameters =
+ *
+ * == Introduction ==
+ *
+ * EMPTYLINE
+ *
+ * In this test we run multiple simulations if a Cellular Potts model of a
+ * colon crypt. We do this to see the dependance of the simulation
+ * in the dynamic parameters of the CPM
+ *
+ * Full details of the computational model can be found in
+ * Osborne (2015) "A Multiscale Model of Colorectal Cancer Using the Cellular Potts Framework".
+ *
+ * This class was used to produce the data for Figure 4.
+ *
+ * == Including header files ==
+ *
+ * EMPTYLINE
+ *
+ * We begin by including the necessary header files which are tha same as for a single simulation.
+ */
 #include <cxxtest/TestSuite.h>
-
-// Must be included before other cell_based headers
 #include "CellBasedSimulationArchiver.hpp"
 
 #include "TransitCellProliferativeType.hpp"
@@ -28,27 +47,15 @@
 #include "PetscSetupAndFinalize.hpp"
 #include "Debug.hpp"
 
+/* == Running Multiple Simulations ==
+ *
+ * EMPTYLINE
+ *
+ * First of all, we define the test class.
+ */
 class TestPottsCrypt : public AbstractCellBasedTestSuite
 {
-private:
-
-    double mLastStartTime;
-    void setUp()
-    {
-        mLastStartTime = std::clock();
-        AbstractCellBasedTestSuite::setUp();
-    }
-    void tearDown()
-    {
-        double time = std::clock();
-        double elapsed_time = (time - mLastStartTime)/(CLOCKS_PER_SEC);
-        std::cout << "Elapsed time: " << elapsed_time << std::endl;
-        AbstractCellBasedTestSuite::tearDown();
-    }
-
 public:
-
-
     void TestMultiplePottsCrypt() throw (Exception)
     {
     	// Change to get different random seeds
