@@ -147,12 +147,12 @@ public:
                     PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
                     cell_population.SetNumSweepsPerTimestep(1);
 
-			        cell_population.AddCellPopulationCountWriter<CellProliferativeTypesCountWriter>();
-			        cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
-			        cell_population.AddCellWriter<CellProliferativeTypesWriter>();
-			        cell_population.AddCellWriter<CellMutationStatesWriter>();
-			        cell_population.AddCellWriter<CellVolumesWriter>();
-					cell_population.AddCellWriter<CellIdWriter>();
+                    cell_population.AddCellPopulationCountWriter<CellProliferativeTypesCountWriter>();
+                    cell_population.AddCellPopulationCountWriter<CellMutationStatesCountWriter>();
+                    cell_population.AddCellWriter<CellProliferativeTypesWriter>();
+                    cell_population.AddCellWriter<CellMutationStatesWriter>();
+                    cell_population.AddCellWriter<CellVolumesWriter>();
+                    cell_population.AddCellWriter<CellIdWriter>();
 
                     /* As before, create an instance of a Wnt concentration. */
                     WntConcentration<2>::Instance()->SetType(LINEAR);
@@ -232,14 +232,13 @@ public:
 
                         if (dist_from_blob_centre < blob_radius)
                         {
-                            cell_iter->SetMutationState(p_state);
+                        	cell_iter->SetMutationState(p_state);
                             // Also label cells as using Diff adhesion
                             cell_iter->AddCellProperty(p_label);
 
-                        	RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
-                        	// reset all the cell ages as otherwise the mutant patch will divide straight away as originally old cells
-                        	cell_iter->SetBirthTime(time_to_steady_state - 16* p_gen->ranf() );
-
+                            RandomNumberGenerator* p_gen = RandomNumberGenerator::Instance();
+                            // reset all the cell ages as otherwise the mutant patch will divide straight away as originally old cells
+                            cell_iter->SetBirthTime(time_to_steady_state - 16* p_gen->ranf() );
                         }
                     }
 
