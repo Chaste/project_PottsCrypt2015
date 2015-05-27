@@ -1,5 +1,5 @@
-#ifndef TESTPOTTSCRYPTSWEEP_HPP_
-#define TESTPOTTSCRYPTSWEEP_HPP_
+#ifndef TESTPOTTSCRYPTSWEEPLITERATEPAPER_HPP_
+#define TESTPOTTSCRYPTSWEEPLITERATEPAPER_HPP_
 
 #include <cxxtest/TestSuite.h>
 
@@ -53,7 +53,7 @@ public:
     {
     	// Change to get different random seeds
         unsigned start_sim = 1;
-        unsigned num_sims = 1; //10
+        unsigned num_sims = 1;
 
      	double mid_time = 25;
      	double end_time = 50;
@@ -212,4 +212,4 @@ public:
     }
 };
 
-#endif /*TESTPOTTSCRYPTSWEEP_HPP_*/
+#endif /*TESTPOTTSCRYPTSWEEPLITERATEPAPER_HPP_*/

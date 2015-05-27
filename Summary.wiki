@@ -3,6 +3,7 @@
 Designed only to work as bolt-on project for Chaste v3.2 or v3.3.
 
 This section contains pages generated automatically from the source code accompanying "A Multiscale Model of Colorectal Cancer Using the Cellular Potts Framework "
+
 == Getting the code and installing dependencies ==
 
 Before running these examples you will need to [wiki:InstallGuides/InstallGuide install Chaste's dependencies] and the [http://www.cs.ox.ac.uk/chaste/download.html source code for version 3.3].
@@ -20,25 +21,30 @@ Now the project should be installed, and everything should compile and run corre
 You can now run the tests or simulations, or create your own test suites.
 
 == Documentation ==
-There are three folders - `src`, `test` and `matlab`.
+There are two folders - `src` and `test`.
  1. The `src` folder contains the following classes:
   * `CellShapeOutputModifier.xpp` - Modifier class to Output the Area Perimeter and Circularity of cells in a simulation.
   * `FixedSimpleWntCellCycleModel.xpp` - A version of the [https://chaste.cs.ox.ac.uk/public-docs/classSimpleWntCellCycleModel.html SimpleWntCellCycleModel] class to represent the cell cycle model as described in the paper.
   * `MutantBaseTrackerModifier.xpp` - Modifier class which tracks the base (and top) of the mutant patch.
   * `MutantCellPottsUpdateRule.xpp` - The component of the Hamiltonian (represented as a `PottsUpdateRule`) which models mutant cells as described in the paper.
-  1. The `test` folder contains:
-  * [wiki:PaperTutorials/PottsCrypt2015/PottsCrypt TestPottsCryptLiteratePaper.hpp] - this file can be run to generate the results in Figure TODO.
-  * [wiki:PaperTutorials/PottsCrypt2015/PottsCryptMutant TestPottsCryptLiteratePaperMutant.hpp] - this file can be run to generate the results in Figure TODO.
-  * [wiki:PaperTutorials/PottsCrypt2015/PottsCryptSweeps TestPottsCryptLiteratePaperSweeps.hpp] - this file can be run to generate the results in Figure TODO.
-  1 The `matlab` folder contains:
-  * TODO
+ 1. The `test` folder contains:
+  * [wiki:PaperTutorials/PottsCrypt2015/PottsCrypt TestPottsCryptLiteratePaper.hpp] - this file can be run to generate the results in Figures 2 and 3.
+  * [wiki:PaperTutorials/PottsCrypt2015/PottsCryptSweeps TestPottsCryptSweepsLiteratePaper.hpp] - this file can be run to generate the results in Figure 4.
+  * [wiki:PaperTutorials/PottsCrypt2015/PottsCryptMutant TestPottsCryptMutantLiteratePaper.hpp] - this file can be run to generate the results in Figures 5 6 and 7.
 == Running tests ==
 You can then run tests and simulations with, for example,
 {{{
 cd <Chaste3.3 path>
 scons b=GccOpt ts=projects/PottsCrypt2015/test/TestPottsCryptLiteratePaper.hpp
 }}}
-
+and 
+{{{
+scons b=GccOpt ts=projects/PottsCrypt2015/test/TestPottsCryptLiteratePaper.hpp
+}}}
+and
+{{{
+scons b=GccOpt ts=projects/PottsCrypt2015/test/TestPottsCryptLiteratePaper.hpp
+}}}
 ----
 '''NB''': the paper was developed with release version 3.2 and 3.3. It will not work with with release version 3.1 or under.
 
