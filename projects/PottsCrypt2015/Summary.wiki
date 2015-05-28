@@ -1,8 +1,15 @@
 = A Cellular Potts Model (CPM) of Colorectal Cancer =
 
-Designed only to work as bolt-on project for Chaste v3.2 or v3.3.
-
 This section contains pages generated automatically from the source code accompanying "A Multiscale Model of Colorectal Cancer Using the Cellular Potts Framework"
+
+The code to run single simulations and was used to produce Figures 2 and 3 can be found here [wiki:PaperTutorials/PottsCrypt2015/PottsCrypt TestPottsCryptLiteratePaper.hpp]
+
+The code to run parameter sweeps and was used produce Figure 4 can be found here [wiki:PaperTutorials/PottsCrypt2015/PottsCryptSweeps TestPottsCryptSweepsLiteratePaper.hpp]
+
+The code to run include mutations and was used produce Figures 5 6 and 7 can be found here [wiki:PaperTutorials/PottsCrypt2015/PottsCryptMutant TestPottsCryptMutantLiteratePaper.hpp]
+
+Before looking at these, you may wish to look at some of the [wiki:UserTutorials basic user tutorials] for Chaste.
+
 
 == Getting the code and installing dependencies ==
 
