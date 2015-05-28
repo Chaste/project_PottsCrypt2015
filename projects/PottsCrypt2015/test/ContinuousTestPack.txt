@@ -1,3 +1,0 @@
-TestPottsCrypt.hpp
-TestPottsCryptMutant.hpp
-TestPottsCryptSweep.hpp
