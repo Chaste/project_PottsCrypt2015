@@ -20,7 +20,7 @@
  *
  * EMPTYLINE
  *
- * We begin by including the necessary header files which are tha same as for a single simulation.
+ * We begin by including the necessary header files which are the same as for a single simulation.
  */
 #include <cxxtest/TestSuite.h>
 #include "CellBasedSimulationArchiver.hpp"
@@ -58,34 +58,34 @@ class TestPottsCrypt : public AbstractCellBasedTestSuite
 public:
     void TestMultiplePottsCrypt() throw (Exception)
     {
-    	// Change to get different random seeds
+
+    	/* These numbers specify the random seeds to use */
         unsigned start_sim = 1;
         unsigned num_sims = 1;
 
+        /* Times to sample the cell number */
      	double mid_time = 25;
      	double end_time = 50;
 
-
+     	/* Specifies the alues of {{{dt}}} and {{{T}}} to use*/
      	double cuberoot10 = 2.15443469;
-
      	double temp[10] = {0.001, 0.001*cuberoot10, 0.001*cuberoot10*cuberoot10, 0.01, 0.01*cuberoot10, 0.01*cuberoot10*cuberoot10, 0.1, 0.1*cuberoot10, 0.1*cuberoot10*cuberoot10, 1.0};// 3.1623, 10.0}; // 31.623, 100};
         unsigned max_temp_index = 10;
-
      	double dt[7] = {0.1, 0.01*cuberoot10*cuberoot10, 0.01*cuberoot10,  0.01, 0.001*cuberoot10*cuberoot10, 0.001*cuberoot10, 0.001};
         unsigned max_dt_index = 7;
 
-     	// Code to output the number of cells in the crypt to a dat file.
-        /** Results file cell velocities. */
+     	/* This code allows us to to output the number of cells in the crypt, at the mid and end point, for each simulation in the crypt to a file, {{{cellnumbers.dat}}}
+     	 * This is what's used to make the contour plots in Figure 4 .*/
         out_stream p_cell_number_file;
         OutputFileHandler output_file_handler("Potts/CylindricalCrypt/Sweeps/", false);
         p_cell_number_file = output_file_handler.OpenOutputFile("cellnumbers.dat");
 
-     	// Loop over dt
+     	/* First loop over {{{dt}}}. */
 		for (unsigned dt_index=0;  dt_index < max_dt_index;  dt_index++)
 		{
 			std::cout << "\nDt " << dt[dt_index] << "... " << std::flush;
 
-			// Loop over Temp
+			/* Then loop over {{{T}}}.*/
 			for (unsigned temp_index=0;  temp_index < max_temp_index; temp_index++)
 			{
 				std::cout << "\n\tTemp " << temp[temp_index] << ", " << std::flush;
@@ -93,24 +93,25 @@ public:
 		     	double number_of_cells_in_middle = 0.0;
 		     	double number_of_cells_at_end = 0.0;
 
-		     	// Loop over seed
+		     	/* Finally loop over the random seed. */
 			    for(unsigned index=start_sim; index < start_sim + num_sims; index++)
 				{
 					std::cout << " Run number " << index << "... " << std::flush;
 
 
-					// Re seed the random number generator
+					/* Re seed the random number generator*/
 					RandomNumberGenerator::Instance()->Reseed(100*index);
+
+					/* THe rest is very simular to the single simulation */
 
 					double crypt_length = 100;
 
-					// Create a simple 2D PottsMesh
+					/* Create a simple 2D PottsMesh and some cells */
 					PottsMeshGenerator<2> generator(50, 10, 5, 110, 20, 5, 1, 1, 1, true, true);
 					PottsMesh<2>* p_mesh = generator.GetMesh();
 
-                    MAKE_PTR(TransitCellProliferativeType, p_transit_type);
-
                     // Create cells
+					MAKE_PTR(TransitCellProliferativeType, p_transit_type);
 					std::vector<CellPtr> cells;
 					CellsGenerator<SimpleWntCellCycleModel, 2> cells_generator;
 					cells_generator.GenerateBasicRandom(cells, p_mesh->GetNumElements(), p_transit_type);
@@ -123,9 +124,11 @@ public:
 						dynamic_cast<SimpleWntCellCycleModel*>(cells[i]->GetCellCycleModel())->SetWntTransitThreshold(2.0/3.0);
 					}
 
-					// Create cell population
+					/* Create cell population, Wnt stimulus and the simulaton.*/
 					PottsBasedCellPopulation<2> cell_population(*p_mesh, cells);
 					cell_population.SetNumSweepsPerTimestep(1);
+
+					/* Select the appropriate {{{T}}}.*/
 					cell_population.SetTemperature(temp[temp_index]);
 
 			        cell_population.AddCellPopulationCountWriter<CellProliferativeTypesCountWriter>();
@@ -141,21 +144,22 @@ public:
 
 					// Set up cell-based simulation
 					OnLatticeSimulation<2> simulator(cell_population);
+
+					/* Select the appropriate {{{dt}}}*/
 					simulator.SetDt(dt[dt_index]);
 					simulator.SetSamplingTimestepMultiple((unsigned)(1.0/dt[dt_index]));
 					simulator.SetOutputCellVelocities(true);
 
-					//Create output directory
+					/* Create output directory, this is based on the loops. */
 					std::stringstream out;
 					out <<  "/Dt_" << dt[dt_index] << "/Temp_"<< temp[temp_index] << "/RunIndex_" << index;
 					std::string output_directory = "Potts/CylindricalCrypt/Sweeps/" +  out.str();
 					simulator.SetOutputDirectory(output_directory);
 
-					// Create cell killer and pass in to simulation
+					/* Create cell killers  and update rules.*/
 					MAKE_PTR_ARGS(SloughingCellKiller<2>, p_sloughing_killer, (&cell_population, crypt_length));
 					simulator.AddCellKiller(p_sloughing_killer);
 
-					// Create update rules and pass to the simulation
 					MAKE_PTR(VolumeConstraintPottsUpdateRule<2>, p_volume_constraint_update_rule);
 					p_volume_constraint_update_rule->SetMatureCellTargetVolume(25);
 					p_volume_constraint_update_rule->SetDeformationEnergyParameter(0.1); //Default is 0.5
@@ -163,7 +167,7 @@ public:
 					MAKE_PTR(AdhesionPottsUpdateRule<2>, p_adhesion_update_rule);
 					simulator.AddPottsUpdateRule(p_adhesion_update_rule);
 
-					// Run simulation to middle
+					/* Run simulation to middle, and store the number of cells.*/
 					simulator.SetEndTime(mid_time);
 					simulator.Solve();
 
@@ -181,10 +185,9 @@ public:
 					}
 					number_of_cells_in_middle += local_num_cells_in_middle;
 
-					// Run simulation to end
+					/* Run simulation to end, and store the number of cells.*/
                     simulator.SetEndTime(end_time);
 					simulator.Solve();
-
 
 					// Get number of elements of non zero size
 					PottsMesh<2>& potts_mesh_end = static_cast<PottsMesh<2>&>(simulator.rGetCellPopulation().rGetMesh());
@@ -201,7 +204,7 @@ public:
 					}
 					number_of_cells_at_end += local_num_cells_at_end;
 
-					// Tidy up
+					/* Finally we reset singletons as we're running multiple simulations in a loop. */
 					WntConcentration<2>::Destroy();
 					SimulationTime::Destroy();
 					SimulationTime::Instance()->SetStartTime(0.0);
@@ -217,6 +220,11 @@ public:
         std::cout << "\n" << std::flush;
         p_cell_number_file->close();
     }
+    /* With the parameters as above the simulation will take a couple of hours, this is due to sweeping over very small {{{dt}}}s.
+     *
+   	 * The data to reproduce Figure 4 can be generated by running this simulation for more random seeds and averaging the results as described in the paper.
+   	 * The data is in the {{{/tmp/$USER/testoutput/Potts/PottsCryptSweeps/cellnumbers.dat}}}.
+   	 */
 };
 
 #endif /*TESTPOTTSCRYPTSWEEPLITERATEPAPER_HPP_*/
