@@ -6,7 +6,7 @@ The code to run single simulations and was used to produce Figures 2 and 3 can b
 
 The code to run parameter sweeps and was used produce Figure 4 can be found here [wiki:PaperTutorials/PottsCrypt2015/PottsCryptSweeps TestPottsCryptSweepsLiteratePaper.hpp]
 
-The code to run include mutations and was used produce Figures 5 6 and 7 can be found here [wiki:PaperTutorials/PottsCrypt2015/PottsCryptMutant TestPottsCryptMutantLiteratePaper.hpp]
+The code to run include mutations and was used produce Figures 5, 6 and 7 can be found here [wiki:PaperTutorials/PottsCrypt2015/PottsCryptMutant TestPottsCryptMutantLiteratePaper.hpp]
 
 Before looking at these, you may wish to look at some of the [wiki:UserTutorials basic user tutorials] for Chaste.
 
