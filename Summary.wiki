@@ -55,5 +55,5 @@ scons b=GccOpt ts=projects/PottsCrypt2015/test/TestPottsCryptMutantLiteratePaper
 ----
 '''NB''': the paper was developed with release version 3.2 and 3.3. It will not work with with release version 3.1 or under.
 
-For further information on using Chaste, see [wiki:ChasteGuides extensive guide material].
+For further information on using Chaste, see the [wiki:ChasteGuides extensive guide material].
 You may also wish to look at some of the [wiki:UserTutorials basic user tutorials].
