@@ -1,6 +1,6 @@
 = A Cellular Potts Model (CPM) of Colorectal Cancer =
 
-This section contains pages generated automatically from the source code accompanying "A Multiscale Model of Colorectal Cancer Using the Cellular Potts Framework" http://dx.doi.org/10.4137/CIN.S19332
+This section contains pages generated automatically from the source code accompanying "Multiscale Model of Colorectal Cancer Using the Cellular Potts Framework" http://dx.doi.org/10.4137/CIN.S19332
 
 The code to run single simulations and was used to produce Figures 2 and 3 can be found here [wiki:PaperTutorials/PottsCrypt2015/PottsCrypt TestPottsCryptLiteratePaper.hpp]
 
